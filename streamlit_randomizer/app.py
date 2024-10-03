@@ -1,26 +1,23 @@
 import random  # Для генерации случайных чисел
 import streamlit as st  # Для создания веб-интерфейса
-import os
+from streamlit_server_state import server_state, server_state_lock
 # Имя файла, в котором будет храниться список оставшихся слов
 FILE_NAME = "remaining_words.txt"
 
 # Заранее заданный список слов
 words = ["Кринж", "Радость", "Грусть", "Страх", "Отвращение", "Удивление", "Брезгливость", "Смущение", "Зависть", "ЧСВ", "Ностальгия", "Навязчивость"]
 
-# Функция для чтения оставшихся слов из файла
+# Функция для загрузки оставшихся слов
 def load_words():
-    if os.path.exists(FILE_NAME):
-        with open(FILE_NAME, "r") as file:
-            remaining_words = file.read().splitlines()
-    else:
-        remaining_words = words.copy()  # Если файла нет, используем исходный список слов
-        save_words(remaining_words)  # Сохраняем его в файл
-    return remaining_words
+    with server_state_lock:
+        if "remaining_words" not in server_state:
+            server_state.remaining_words = words.copy()  # Инициализируем список слов на сервере
+    return server_state.remaining_words
 
-# Функция для сохранения оставшихся слов в файл
+# Функция для сохранения обновлённого списка слов
 def save_words(remaining_words):
-    with open(FILE_NAME, "w") as file:
-        file.write("\n".join(remaining_words))
+    with server_state_lock:
+        server_state.remaining_words = remaining_words
         
 # Основная функция приложения
 def main():
@@ -31,14 +28,14 @@ def main():
     # Загружаем список оставшихся слов
     remaining_words = load_words()
 
-    # Проверяем, есть ли оставшиеся слова
+   # Проверяем, есть ли оставшиеся слова
     if remaining_words:
-        if st.button("Выбрать"):
+        if st.button("Выбрать случайное слово"):
             # Выбираем случайное слово и удаляем его из списка
             selected_word = random.choice(remaining_words)
             remaining_words.remove(selected_word)
-            save_words(remaining_words)  # Сохраняем обновлённый список в файл
-
+            save_words(remaining_words)  # Сохраняем обновлённый список на сервере
+            
             # Выводим выбранное слово
             st.success(f"Эмоция: {selected_word}")
         else:
