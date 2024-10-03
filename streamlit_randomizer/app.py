@@ -1,34 +1,48 @@
 import random  # Для генерации случайных чисел
 import streamlit as st  # Для создания веб-интерфейса
+import os
+# Имя файла, в котором будет храниться список оставшихся слов
+FILE_NAME = "remaining_words.txt"
 
 # Заранее заданный список слов
 words = ["Кринж", "Радость", "Грусть", "Страх", "Отвращение", "Удивление", "Брезгливость", "Смущение", "Зависть", "ЧСВ", "Ностальгия", "Навязчивость"]
 
+# Функция для чтения оставшихся слов из файла
+def load_words():
+    if os.path.exists(FILE_NAME):
+        with open(FILE_NAME, "r") as file:
+            remaining_words = file.read().splitlines()
+    else:
+        remaining_words = words.copy()  # Если файла нет, используем исходный список слов
+        save_words(remaining_words)  # Сохраняем его в файл
+    return remaining_words
+
+# Функция для сохранения оставшихся слов в файл
+def save_words(remaining_words):
+    with open(FILE_NAME, "w") as file:
+        file.write("\n".join(remaining_words))
+        
 # Основная функция приложения
 def main():
     # Заголовок приложения
     st.title("Рандомайзер эмоций")
     st.write("Нажмите на кнопку, чтобы получить случайную эмоцию. Каждая эмоция может выпасть только один раз.")
 
-    # Создаем сессию для хранения оставшихся слов
-    if "remaining_words" not in st.session_state:
-        st.session_state.remaining_words = words.copy()  # Копируем начальный список слов
+    # Загружаем список оставшихся слов
+    remaining_words = load_words()
 
     # Проверяем, есть ли оставшиеся слова
-    if st.session_state.remaining_words:
-        # Кнопка для выбора случайного слова
+    if remaining_words:
         if st.button("Выбрать"):
-            # Выбираем случайное слово и удаляем его из оставшихся
-            selected_word = random.choice(st.session_state.remaining_words)
-            st.session_state.remaining_words.remove(selected_word)
+            # Выбираем случайное слово и удаляем его из списка
+            selected_word = random.choice(remaining_words)
+            remaining_words.remove(selected_word)
+            save_words(remaining_words)  # Сохраняем обновлённый список в файл
 
             # Выводим выбранное слово
             st.success(f"Эмоция: {selected_word}")
-        else:
-            st.info("Нажмите кнопку, чтобы выбрать эмоцию.")
     else:
-        # Если слова закончились, выводим сообщение
-        st.warning("Все слова были выбраны! Обновите страницу, чтобы начать заново.")
+        st.warning("Упс, кажется все эмоции уже разобрали:(")
     
 # Запуск главной функции приложения
 if __name__ == "__main__":
