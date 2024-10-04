@@ -50,7 +50,7 @@ def main():
                 # Устанавливаем состояние выбора слова в True
                 st.session_state.word_chosen = True
             # Выводим выбранное слово
-                st.success(f"Твоя эмоция: {selected_word}")
+                st.success(f"Твоя эмоция: {st.session_state.selected_word}")
         else:
             st.warning("Уго! Обязательно запомни свою эмоцию, ведь тебе ещё нужно презентовать её в субботу!;)")
             st.info(f"Твоя эмоция: {st.session_state.selected_word}")
