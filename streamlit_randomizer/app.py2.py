@@ -2,6 +2,9 @@ import random
 import streamlit as st
 from streamlit_server_state import server_state, server_state_lock
 
+# Имя файла, в котором будет храниться список оставшихся слов
+FILE_NAME = "remaining_words.txt"
+
 # Начальный список слов
 words = ["Кринж", "Радость", "Грусть", "Страх", "Отвращение", "Удивление", 
          "Брезгливость", "Смущение", "Зависть", "ЧСВ", "Ностальгия", "Навязчивость"]
