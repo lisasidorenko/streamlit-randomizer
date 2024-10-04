@@ -32,26 +32,28 @@ def main():
     # Загружаем список оставшихся слов
     remaining_words = load_words()
 
-     # Проверяем, есть ли оставшиеся слова
+    # Проверяем, есть ли оставшиеся слова
     if remaining_words:
         # Используем состояние для хранения информации о том, выбрано ли слово
         if 'word_chosen' not in st.session_state:
             st.session_state.word_chosen = False
+            st.session_state.selected_word = ""  # Инициализируем переменную для выбранного слова
 
         # Если слово еще не выбрано, показываем кнопку
         if not st.session_state.word_chosen:
-            if st.button("Выбрать случайное слово"):
+            if st.button("Выбрать случайную эмоцию"):
                 # Выбираем случайное слово и удаляем его из списка
-                selected_word = random.choice(remaining_words)
-                remaining_words.remove(selected_word)
+                st.session_state.selected_word = random.choice(remaining_words)
+                remaining_words.remove(st.session_state.selected_word)
                 save_words(remaining_words)  # Сохраняем обновлённый список в файл
 
                 # Устанавливаем состояние выбора слова в True
                 st.session_state.word_chosen = True
             # Выводим выбранное слово
-            st.success(f"Ваша эмоция: {selected_word}")
+                st.success(f"Твоя эмоция: {selected_word}")
         else:
-            st.warning("Уго! Обязательно запомни свою эмоцию, ведь тебе нужно будет её презентовать в субботу!;)")
+            st.warning("Уго! Обязательно запомни свою эмоцию, ведь тебе ещё нужно презентовать её в субботу!;)")
+            st.info(f"Твоя эмоция: {st.session_state.selected_word}")
     else:
         st.warning("Упс, кажется эмоций больше не осталось:(")
 
